@@ -1,0 +1,35 @@
+#Prefix displayed before a message. ExamplePrefix > Message
+#Use "" to define the message like the default value, removing them will return "null"
+#use & to use colors! Example: &c = red &6 = gold
+prefix: "&6SignEditor"
+#When it is not a player, for example the console.
+#Use "" to define the message like the default value, removing them will return "null"
+isNotPlayer: "&cYou are not a player, please log in to use this command."
+#Use prefix before message? true or false, no quotations.
+useINPprefix: true
+#When the player has no message
+#Use "" to define the message like the default value, removing them will return "null"
+noPermissions: "&cYou do not have the required permissions to use this command"
+#Use prefix before message? true or false, no quotations.
+useNPprefix: true
+#When the sign is updated.
+#Use "" to define the message like the default value, removing them will return "null"
+updatedSign: "&aSign updated successfully!"
+#Use prefix before message? true or false, no quotations.
+useUSprefix: true
+#When the plugin is reloaded.
+reloadMessage: "&aPlugin reloaded!"
+useRMprefix: false
+#If the second argument in the command is not an integer error message.
+isInt: "&cYour second argument was not a number. /signeditor <0-3> <text>"
+useINprefix: false
+#If the player used for example /signeditor 5 <text> instead of 0-3.
+incorrectUsage: "&cIncorrect usage, /signeditor <0-3> <text>"
+useIUprefix: false
+
+  ##Max distance you have to be away from a sign when it is on a wall.
+#Do not use "" or '' use only pure numbers.
+SignPostMaxDistance: 5
+  ##Max distance you have to be away from a sign when it is on the ground.
+#Do not use "" or '' use only pure numbers.
+SignWallMaxDistance: 5

@@ -1,0 +1,12 @@
+name: SignEditorCommand
+version: ${project.version}
+main: signeditor.signeditor.SignEditor
+authors: [Laleem]
+description: A simple sign editor!
+commands:
+  SignEditor:
+    usage: /SignEditor <0-3> <text>
+    description: A simple sign editor plugin
+  SignEditorReload:
+    usage: /SignEditorReload
+    description: Reload the plugin
