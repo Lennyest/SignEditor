@@ -16,22 +16,19 @@ public class SignEditorReload implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
-        if (command.getName().equalsIgnoreCase("SignEditorReload")){
-                try {
-                    if (useRMprefix) {
-                        sender.sendMessage(prefix + " " + reloadMessage);
-                        SignEditor.getPl().fileConfiguration.load(SignEditor.getPl().file);
-                    } else {
-                        sender.sendMessage(reloadMessage);
-                        SignEditor.getPl().fileConfiguration.load(SignEditor.getPl().file);
-                    }
-                } catch (IOException | InvalidConfigurationException e) {
-                    e.printStackTrace();
-                }
+        try {
+            if (useRMprefix) {
+                SignEditor.getPl().fileConfiguration.load(SignEditor.getPl().file);
+                sender.sendMessage(prefix + " " + reloadMessage);
                 return true;
+            } else {
+                SignEditor.getPl().fileConfiguration.load(SignEditor.getPl().file);
+                sender.sendMessage(reloadMessage);
+                return true;
+            }
+        } catch (IOException | InvalidConfigurationException e) {
+            e.printStackTrace();
         }
-
         return false;
     }
 }

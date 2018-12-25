@@ -10,3 +10,6 @@ commands:
   SignEditorReload:
     usage: /SignEditorReload
     description: Reload the plugin
+  SignEditorGUI:
+    usage: /SignEditorGUI
+    description: Open a menu to view messages and edit them.
