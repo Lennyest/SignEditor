@@ -3,7 +3,6 @@ package signeditor.signeditor.Commands;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,18 +15,25 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import signeditor.signeditor.SignEditor;
 
+import java.util.ArrayList;
+
+
 public class SignEditorGUI implements CommandExecutor, Listener {
 
     private Inventory SignEditorGUI = Bukkit.createInventory(null, 36, "SignEditor GUI");
+    private Inventory messagesGUI = Bukkit.createInventory(null, 36, "Messages GUI");
 
-    private String prefix = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("prefix").toString());
-    private double version = (double) SignEditor.getPl().fileConfiguration.get("Version");
     private String isNotPlayer = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("isNotPlayer").toString());
     private boolean useINPprefix = SignEditor.getPl().fileConfiguration.getBoolean("useINPprefix");
     private String noPermissions = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("noPermissions").toString());
     private boolean useNPprefix = SignEditor.getPl().fileConfiguration.getBoolean("useNPprefix");
+    private String updatedSign = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("updatedSign").toString());
+    private boolean useUSprefix = SignEditor.getPl().fileConfiguration.getBoolean("useUSprefix");
     private String incorrectUsage = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("incorrectUsage").toString());
     private boolean useIUprefix = SignEditor.getPl().fileConfiguration.getBoolean("useIUprefix");
+    private int SignPostMaxDistance = (int) SignEditor.getPl().fileConfiguration.get("SignPostMaxDistance");
+    private int SignWallMaxDistance = (int) SignEditor.getPl().fileConfiguration.get("SignWallMaxDistance");
+    private String prefix = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("prefix").toString());
 
     private Material closeButtonMaterial = Material.valueOf(SignEditor.getPl().fileConfiguration.get("CloseButtonMaterial").toString());
     private String closeButtonDisplayName = SignEditor.getPl().fileConfiguration.get("CloseButtonDisplayName").toString();
@@ -35,19 +41,21 @@ public class SignEditorGUI implements CommandExecutor, Listener {
     private boolean closeButtonMaterialUse = (boolean) SignEditor.getPl().fileConfiguration.get("UseCloseButton");
     private int closeButtonMaterialPosition = (int) SignEditor.getPl().fileConfiguration.get("CloseButtonPosition");
 
-
     private Material messagesButtonMaterial = Material.valueOf(SignEditor.getPl().fileConfiguration.get("MessagesButtonMaterial").toString());
     private String messagesButtonDisplayName = SignEditor.getPl().fileConfiguration.get("MessagesButtonDisplayName").toString();
     private int messagesButtonDataType = (int) SignEditor.getPl().fileConfiguration.get("MessagesButtonDataValue");
     private boolean messagesButtonMaterialUse = (boolean) SignEditor.getPl().fileConfiguration.get("UseMessagesButton");
     private int messagesButtonMaterialPosition = (int) SignEditor.getPl().fileConfiguration.get("MessagesButtonPosition");
 
+    private double version = (double) SignEditor.getPl().fileConfiguration.get("Version");
     private boolean useVersionItem = (boolean) SignEditor.getPl().fileConfiguration.get("UseVersionItem");
 
     /*
     Add a null check for basically everything, need to find a good way to do it without having to repeat myself too much.
     Finish reload command to make the plugin more user-friendly.
     Add a check if any items are overlapping, especially final ones like the version itemstack. Will probably have to do it manually.
+    Add a {sender} variable for the config which replaces with sender.
+    Move all itemstacks to another class to avoid clutter like now.
     Anything else?
     */
 
@@ -113,10 +121,11 @@ public class SignEditorGUI implements CommandExecutor, Listener {
             if (useVersionItem) {
                 ItemStack versionItem = new ItemStack(Material.REDSTONE_TORCH_ON, 1);
                 ItemMeta versionItemMeta = versionItem.getItemMeta();
-                versionItemMeta.setDisplayName(ChatColor.GREEN + "Current Version: " + version );
+                versionItemMeta.setDisplayName(ChatColor.GREEN + "Current Version: " + version);
                 versionItem.setItemMeta(versionItemMeta);
                 SignEditorGUI.setItem(0, versionItem);
             }
+
             Player player = (Player) sender;
             player.openInventory(SignEditorGUI);
         }
@@ -124,15 +133,159 @@ public class SignEditorGUI implements CommandExecutor, Listener {
     }
 
     @EventHandler
-    public void closeButtonClick(InventoryClickEvent event) {
-        if (event.getInventory().getTitle().equalsIgnoreCase( "SignEditorGUI")) {
-            if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(closeButtonDisplayName)) {
-                if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase("&6Messages")) { //Added at 06.03 not tested.
-                    Player player = (Player) event.getWhoClicked();
-                    event.setCancelled(true);
-                    player.closeInventory();
-                }
+    public void eventClick(InventoryClickEvent event) {
+        Player player = (Player) event.getWhoClicked();
+
+        if (event.getInventory().getTitle().equalsIgnoreCase("SignEditor GUI")) {
+            if (event.getCurrentItem().getItemMeta() == null) return;
+            if (event.getCurrentItem().getType() == Material.AIR) return;
+
+            if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', closeButtonDisplayName))) {
+                event.setCancelled(true);
+                player.closeInventory();
+            }
+
+            if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', messagesButtonDisplayName))) {
+                player.closeInventory();
+                player.openInventory(messagesGUI);
+            }
+
+        }
+
+        ItemStack isNotPlayer = new ItemStack(Material.PAPER, 1);
+        ItemMeta isNotPlayerItemMeta = isNotPlayer.getItemMeta();
+        isNotPlayerItemMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "isNotPlayer");
+        ArrayList<String> lore = new ArrayList<>();
+        lore.add(ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("isNotPlayer").toString()));
+        isNotPlayerItemMeta.setLore(lore);
+        isNotPlayer.setItemMeta(isNotPlayerItemMeta);
+
+        if (useINPprefix) {
+            ItemStack INPGreen = new ItemStack(Material.STAINED_CLAY, 1, (byte) 13);
+            ItemMeta INPGreenMeta = INPGreen.getItemMeta();
+            INPGreenMeta.setDisplayName(ChatColor.GREEN + "Use isNotPlayer prefix: " + ChatColor.WHITE + ChatColor.BOLD + SignEditor.getPl().fileConfiguration.get("useINPprefix"));
+            INPGreen.setItemMeta(INPGreenMeta);
+            messagesGUI.setItem(10, INPGreen);
+        } else {
+            ItemStack INPRed = new ItemStack(Material.STAINED_CLAY, 1, (byte) 14);
+            ItemMeta INPRedMeta = INPRed.getItemMeta();
+            INPRedMeta.setDisplayName(ChatColor.GREEN + "Use isNotPlayer prefix: " + ChatColor.WHITE + ChatColor.BOLD + SignEditor.getPl().fileConfiguration.get("useINPprefix"));
+            INPRed.setItemMeta(INPRedMeta);
+            messagesGUI.setItem(10, INPRed);
+        }
+
+        ItemStack noPermissions = new ItemStack(Material.PAPER, 1);
+        ItemMeta noPermissionsItemMeta = noPermissions.getItemMeta();
+        noPermissionsItemMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "noPermissions");
+        ArrayList<String> noPermissionsLore = new ArrayList<>();
+        noPermissionsLore.add(ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("noPermissions").toString()));
+        noPermissionsItemMeta.setLore(noPermissionsLore);
+        noPermissions.setItemMeta(noPermissionsItemMeta);
+
+        if (useNPprefix) {
+            ItemStack NPGreen = new ItemStack(Material.STAINED_CLAY, 1, (byte) 13);
+            ItemMeta INPGreenMeta = NPGreen.getItemMeta();
+            INPGreenMeta.setDisplayName(ChatColor.GREEN + "Use noPermissions prefix: " + ChatColor.WHITE + ChatColor.BOLD + SignEditor.getPl().fileConfiguration.get("useNPprefix"));
+            NPGreen.setItemMeta(INPGreenMeta);
+            messagesGUI.setItem(12, NPGreen);
+        } else {
+            ItemStack NPRed = new ItemStack(Material.STAINED_CLAY, 1, (byte) 14);
+            ItemMeta NPRedMeta = NPRed.getItemMeta();
+            NPRedMeta.setDisplayName(ChatColor.GREEN + "Use noPermissions prefix: " + ChatColor.WHITE + ChatColor.BOLD + SignEditor.getPl().fileConfiguration.get("useNPprefix"));
+            NPRed.setItemMeta(NPRedMeta);
+            messagesGUI.setItem(12, NPRed);
+        }
+
+        ItemStack incorrectUsage = new ItemStack(Material.PAPER, 1);
+        ItemMeta incorrectUsageMeta = noPermissions.getItemMeta();
+        incorrectUsageMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "incorrectUsage");
+        ArrayList<String> incorrectUsageLore = new ArrayList<>();
+        incorrectUsageLore.add(ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("incorrectUsage").toString()));
+        incorrectUsageMeta.setLore(incorrectUsageLore);
+        incorrectUsage.setItemMeta(incorrectUsageMeta);
+
+
+        if (useIUprefix) {
+            ItemStack IUGreen = new ItemStack(Material.STAINED_CLAY, 1, (byte) 13);
+            ItemMeta INPGreenMeta = IUGreen.getItemMeta();
+            INPGreenMeta.setDisplayName(ChatColor.GREEN + "Use incorrectUsage prefix: " + ChatColor.WHITE + ChatColor.BOLD + SignEditor.getPl().fileConfiguration.get("useIUprefix"));
+            IUGreen.setItemMeta(INPGreenMeta);
+            messagesGUI.setItem(14, IUGreen);
+        } else {
+            ItemStack IURed = new ItemStack(Material.STAINED_CLAY, 1, (byte) 14);
+            ItemMeta IURedMeta = IURed.getItemMeta();
+            IURedMeta.setDisplayName(ChatColor.GREEN + "Use incorrectUsage prefix: " + ChatColor.WHITE + ChatColor.BOLD + SignEditor.getPl().fileConfiguration.get("useIUprefix"));
+            IURed.setItemMeta(IURedMeta);
+            messagesGUI.setItem(14, IURed);
+        }
+
+
+        ItemStack updatedSign = new ItemStack(Material.PAPER, 1);
+        ItemMeta updatedSignItemMeta = updatedSign.getItemMeta();
+        updatedSignItemMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "updatedSign");
+        ArrayList<String> updatedSignlore = new ArrayList<>();
+        updatedSignlore.add(ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("updatedSign").toString()));
+        updatedSignItemMeta.setLore(updatedSignlore);
+        updatedSign.setItemMeta(updatedSignItemMeta);
+
+        if (useUSprefix) {
+            ItemStack IUGreen = new ItemStack(Material.STAINED_CLAY, 1, (byte) 13);
+            ItemMeta INPGreenMeta = IUGreen.getItemMeta();
+            INPGreenMeta.setDisplayName(ChatColor.GREEN + "Use updatedSign prefix: " + ChatColor.WHITE + ChatColor.BOLD + SignEditor.getPl().fileConfiguration.get("useUSprefix"));
+            IUGreen.setItemMeta(INPGreenMeta);
+            messagesGUI.setItem(16, IUGreen);
+        } else {
+            ItemStack IURed = new ItemStack(Material.STAINED_CLAY, 1, (byte) 14);
+            ItemMeta IURedMeta = IURed.getItemMeta();
+            IURedMeta.setDisplayName(ChatColor.GREEN + "Use updatedSign prefix: " + ChatColor.WHITE + ChatColor.BOLD + SignEditor.getPl().fileConfiguration.get("useUSprefix"));
+            IURed.setItemMeta(IURedMeta);
+            messagesGUI.setItem(16, IURed);
+        }
+
+        ItemStack signpostMax = new ItemStack(Material.PAPER, 1);
+        ItemMeta signpostMeta = signpostMax.getItemMeta();
+        signpostMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "SignPostMaxDistance");
+        ArrayList<String> signpostMaxLore = new ArrayList<>();
+        signpostMaxLore.add(ChatColor.GREEN + "Max distance: " + ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("SignPostMaxDistance").toString()));
+        signpostMeta.setLore(signpostMaxLore);
+        signpostMax.setItemMeta(signpostMeta);
+
+        ItemStack wallpostMax = new ItemStack(Material.PAPER, 1);
+        ItemMeta wallpostMeta = signpostMax.getItemMeta();
+        wallpostMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "SignWallMaxDistance");
+        ArrayList<String> wallpostMaxLore = new ArrayList<>();
+        wallpostMaxLore.add(ChatColor.GREEN + "Max distance: " + ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("SignWallMaxDistance").toString()));
+        wallpostMeta.setLore(wallpostMaxLore);
+        wallpostMax.setItemMeta(wallpostMeta);
+
+        ItemStack closeButton = new ItemStack(closeButtonMaterial, 1, (byte) closeButtonDataType);
+        ItemMeta closeButtonM = closeButton.getItemMeta();
+        closeButtonM.setDisplayName(ChatColor.translateAlternateColorCodes('&', closeButtonDisplayName));
+        closeButton.setItemMeta(closeButtonM);
+
+        if (event.getInventory().getTitle().equalsIgnoreCase("Messages GUI")) {
+            if (event.getCurrentItem().getItemMeta() == null) return;
+            if (event.getCurrentItem().getType() == Material.AIR) return;
+
+            event.setCancelled(true);
+
+            if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "" + ChatColor.BOLD + "BACK")) {
+                //player.closeInventory();
+                player.openInventory(SignEditorGUI);
+            }
+
+            if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', closeButtonDisplayName))) {
+                player.closeInventory();
             }
         }
+
+
+        messagesGUI.setItem(31, closeButton);
+        messagesGUI.setItem(1, isNotPlayer);
+        messagesGUI.setItem(3, noPermissions);
+        messagesGUI.setItem(5, incorrectUsage);
+        messagesGUI.setItem(7, updatedSign);
+        messagesGUI.setItem(20, signpostMax);
+        messagesGUI.setItem(24, wallpostMax);
     }
 }

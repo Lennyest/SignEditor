@@ -1,8 +1,15 @@
+#------Common Errors------
+# Q: My item is not set to the one in the config?!
+# A: Something has gone wrong with the config and the item has been set to the default one.
+# Q: The plugin throws out an error when the server starts, why?!?!?!?!!
+# A: Because of how I wrote it (Will be fixed) you HAVE to have all the default config options in here.
+# Issues and source code:
+# https://www.github.com/Lennyest
 #-----Messages Config------
 #Prefix displayed before a message. ExamplePrefix > Message
 #Use "" to define the message like the default value, removing them will return "null"
 #use & to use colors! Example: &c = red &6 = gold
-prefix: "&6SignEditor"
+prefix: "&6SignEditor >"
 #Version:
 Version: 1.5
 #Version item:
@@ -65,5 +72,5 @@ MessagesButtonDisplayName: "&6Messages"
 #If it is just a normal item like paper, set to 0.
 MessagesButtonDataValue: 0
 #Position of the item in the inventory.
-MessagesButtonPosition: 2
+MessagesButtonPosition: 13
 
