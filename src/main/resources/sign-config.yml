@@ -11,7 +11,7 @@
 #use & to use colors! Example: &c = red &6 = gold
 prefix: "&6SignEditor >"
 #Version:
-Version: 1.5
+Version: 1.1
 #Version item:
 UseVersionItem: true
 #When it is not a player, for example the console.

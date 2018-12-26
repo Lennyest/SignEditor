@@ -1,6 +1,5 @@
 package signeditor.signeditor;
 
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -8,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import signeditor.signeditor.Commands.SignEditorCommand;
 import signeditor.signeditor.Commands.SignEditorGUI;
 import signeditor.signeditor.Commands.SignEditorReload;
+import signeditor.signeditor.Events.SIgnEditorChangeEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +32,7 @@ public final class SignEditor extends JavaPlugin {
         getCommand("SignEditorReload").setExecutor(new SignEditorReload());
         getCommand("SignEditorGUI").setExecutor(new SignEditorGUI());
         getServer().getPluginManager().registerEvents(new SignEditorGUI(), this);
+        getServer().getPluginManager().registerEvents(new SIgnEditorChangeEvent(), this);
     }
 
     private void createConfig() {

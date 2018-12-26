@@ -12,15 +12,23 @@ public class SignEditorReload implements CommandExecutor {
     private String prefix = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("prefix").toString());
     private String reloadMessage = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("reloadMessage").toString());
     private boolean useRMprefix = SignEditor.getPl().fileConfiguration.getBoolean("useRMprefix");
+    private String noPermissions = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("noPermissions").toString());
+    private boolean useNPprefix = SignEditor.getPl().fileConfiguration.getBoolean("useNPprefix");
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-            if (useRMprefix) {
-                SignEditor.getPl().saveResource("sign-config.yml", true);
-                SignEditor.getPl().fileConfiguration = YamlConfiguration.loadConfiguration(SignEditor.getPl().file);
-                sender.sendMessage(prefix + " " + reloadMessage);
+
+        if (!sender.hasPermission("SignEditor.RELOAD")) {
+            if (useNPprefix) {
+                sender.sendMessage(prefix + " " + noPermissions);
             } else {
-                SignEditor.getPl().saveResource("sign-config.yml", true);
+                sender.sendMessage(noPermissions);
+            }
+        }
+            if (useRMprefix) {
+                SignEditor.getPl().fileConfiguration = YamlConfiguration.loadConfiguration(SignEditor.getPl().file);
+                sender.sendMessage(prefix + " " + reloadMessage.replaceAll("\\{player}", sender.getName()));
+            } else {
                 SignEditor.getPl().fileConfiguration = YamlConfiguration.loadConfiguration(SignEditor.getPl().file);
                 sender.sendMessage(reloadMessage);
             }

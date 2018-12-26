@@ -1,4 +1,4 @@
-name: SignEditorCommand
+name: SignEditor
 version: ${project.version}
 main: signeditor.signeditor.SignEditor
 authors: [Laleem]

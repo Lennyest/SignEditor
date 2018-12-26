@@ -20,8 +20,8 @@ import java.util.ArrayList;
 
 public class SignEditorGUI implements CommandExecutor, Listener {
 
-    private Inventory SignEditorGUI = Bukkit.createInventory(null, 36, "SignEditor GUI");
-    private Inventory messagesGUI = Bukkit.createInventory(null, 36, "Messages GUI");
+    public static Inventory SignEditorGUI = Bukkit.createInventory(null, 36, "SignEditor GUI");
+    public static Inventory messagesGUI = Bukkit.createInventory(null, 36, "Messages GUI");
 
     private String isNotPlayer = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("isNotPlayer").toString());
     private boolean useINPprefix = SignEditor.getPl().fileConfiguration.getBoolean("useINPprefix");
@@ -31,8 +31,6 @@ public class SignEditorGUI implements CommandExecutor, Listener {
     private boolean useUSprefix = SignEditor.getPl().fileConfiguration.getBoolean("useUSprefix");
     private String incorrectUsage = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("incorrectUsage").toString());
     private boolean useIUprefix = SignEditor.getPl().fileConfiguration.getBoolean("useIUprefix");
-    private int SignPostMaxDistance = (int) SignEditor.getPl().fileConfiguration.get("SignPostMaxDistance");
-    private int SignWallMaxDistance = (int) SignEditor.getPl().fileConfiguration.get("SignWallMaxDistance");
     private String prefix = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("prefix").toString());
 
     private Material closeButtonMaterial = Material.valueOf(SignEditor.getPl().fileConfiguration.get("CloseButtonMaterial").toString());
@@ -205,6 +203,7 @@ public class SignEditorGUI implements CommandExecutor, Listener {
         incorrectUsage.setItemMeta(incorrectUsageMeta);
 
 
+
         if (useIUprefix) {
             ItemStack IUGreen = new ItemStack(Material.STAINED_CLAY, 1, (byte) 13);
             ItemMeta INPGreenMeta = IUGreen.getItemMeta();
@@ -242,6 +241,14 @@ public class SignEditorGUI implements CommandExecutor, Listener {
             messagesGUI.setItem(16, IURed);
         }
 
+        ItemStack prefix = new ItemStack(Material.PAPER, 1);
+        ItemMeta prefixM = prefix.getItemMeta();
+        prefixM.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "prefix");
+        ArrayList<String> prefixLore = new ArrayList<>();
+        prefixLore.add(ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("prefix").toString()));
+        prefixM.setLore(prefixLore);
+        prefix.setItemMeta(prefixM);
+
         ItemStack signpostMax = new ItemStack(Material.PAPER, 1);
         ItemMeta signpostMeta = signpostMax.getItemMeta();
         signpostMeta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "SignPostMaxDistance");
@@ -269,11 +276,6 @@ public class SignEditorGUI implements CommandExecutor, Listener {
 
             event.setCancelled(true);
 
-            if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "" + ChatColor.BOLD + "BACK")) {
-                //player.closeInventory();
-                player.openInventory(SignEditorGUI);
-            }
-
             if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', closeButtonDisplayName))) {
                 player.closeInventory();
             }
@@ -286,6 +288,7 @@ public class SignEditorGUI implements CommandExecutor, Listener {
         messagesGUI.setItem(5, incorrectUsage);
         messagesGUI.setItem(7, updatedSign);
         messagesGUI.setItem(20, signpostMax);
+        messagesGUI.setItem(22, prefix);
         messagesGUI.setItem(24, wallpostMax);
     }
 }
