@@ -13,3 +13,6 @@ commands:
   SignEditorGUI:
     usage: /SignEditorGUI
     description: Open a menu to view messages and edit them.
+  SignEditorBypass:
+    usage: /SignEditorBypass <enable/disable>
+    description: Bypass sign protection

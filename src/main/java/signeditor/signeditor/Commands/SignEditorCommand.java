@@ -8,23 +8,25 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import signeditor.signeditor.Events.SignEditorBlockInteraction;
 import signeditor.signeditor.SignEditor;
+import signeditor.signeditor.Utils.LennyLib;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class SignEditorCommand implements CommandExecutor {
-    public String prefix = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("prefix").toString());
-    public String isNotPlayer = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("isNotPlayer").toString());
-    public boolean useINPprefix = SignEditor.getPl().fileConfiguration.getBoolean("useINPprefix");
-    public String noPermissions = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("noPermissions").toString());
-    public boolean useNPprefix = SignEditor.getPl().fileConfiguration.getBoolean("useNPprefix");
-    public String updatedSign = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("updatedSign").toString());
-    public boolean useUSprefix = SignEditor.getPl().fileConfiguration.getBoolean("useUSprefix");
-    public String incorrectUsage = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("incorrectUsage").toString());
-    public boolean useIUprefix = SignEditor.getPl().fileConfiguration.getBoolean("useIUprefix");
-    public int SignPostMaxDistance = (int) SignEditor.getPl().fileConfiguration.get("SignPostMaxDistance");
-    public int SignWallMaxDistance = (int) SignEditor.getPl().fileConfiguration.get("SignWallMaxDistance");
+    private String prefix = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("prefix").toString());
+    private String isNotPlayer = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("isNotPlayer").toString());
+    private boolean useINPprefix = SignEditor.getPl().fileConfiguration.getBoolean("useINPprefix");
+    private String noPermissions = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("noPermissions").toString());
+    private boolean useNPprefix = SignEditor.getPl().fileConfiguration.getBoolean("useNPprefix");
+    private String updatedSign = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("updatedSign").toString());
+    private boolean useUSprefix = SignEditor.getPl().fileConfiguration.getBoolean("useUSprefix");
+    private String incorrectUsage = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("incorrectUsage").toString());
+    private boolean useIUprefix = SignEditor.getPl().fileConfiguration.getBoolean("useIUprefix");
+    private int SignPostMaxDistance = (int) SignEditor.getPl().fileConfiguration.get("SignPostMaxDistance");
+    private int SignWallMaxDistance = (int) SignEditor.getPl().fileConfiguration.get("SignWallMaxDistance");
 
     private boolean isInt(String s) {
         try {
@@ -87,32 +89,38 @@ public class SignEditorCommand implements CommandExecutor {
                 Block b = player.getTargetBlock(matSet, SignWallMaxDistance);
                 Sign sign = (Sign) b.getLocation().getBlock().getState();
                 if (isInt(args[0])) {
-                    if ((Integer.parseInt(args[0])) <= 3) {
-                        sign.setLine(Integer.parseInt(args[0]), ChatColor.translateAlternateColorCodes('&', message.toString()));
-                        sign.update();
-                        if (useUSprefix) {
-                            player.sendMessage(prefix + " " + updatedSign);
-                        } else {
-                            player.sendMessage(updatedSign);
+                    if (LennyLib.isSignProtected(player, player.getTargetBlock(matSet, SignWallMaxDistance))) {
+                        if ((Integer.parseInt(args[0])) <= 3) {
+                            sign.setLine(Integer.parseInt(args[0]), ChatColor.translateAlternateColorCodes('&', message.toString()));
+                            sign.update();
+                            if (useUSprefix) {
+                                player.sendMessage(prefix + " " + updatedSign);
+                            } else {
+                                player.sendMessage(updatedSign);
+                            }
+                            return true;
                         }
-                        return true;
                     }
                 }
             }
             if (player.getTargetBlock(matSet, SignPostMaxDistance).getType() == Material.SIGN_POST) {
                 Block b = player.getTargetBlock(matSet, SignPostMaxDistance);
                 Sign sign = (Sign) b.getLocation().getBlock().getState();
-                if (isInt(args[0])) {
-                    if ((Integer.parseInt(args[0])) <= 3) {
-                        sign.setLine(Integer.parseInt(args[0]), ChatColor.translateAlternateColorCodes('&', message.toString()));
-                        sign.update();
-                        if (useUSprefix) {
-                            player.sendMessage(prefix + " " + updatedSign);
-                        } else {
-                            player.sendMessage(updatedSign);
+                if (LennyLib.isBypassEnabled() || LennyLib.isSignProtected(player, player.getTargetBlock(matSet, SignWallMaxDistance))) {
+                    if (isInt(args[0])) {
+                        if ((Integer.parseInt(args[0])) <= 3) {
+                            sign.setLine(Integer.parseInt(args[0]), ChatColor.translateAlternateColorCodes('&', message.toString()));
+                            sign.update();
+                            if (useUSprefix) {
+                                player.sendMessage(prefix + " " + updatedSign);
+                            } else {
+                                player.sendMessage(updatedSign);
+                            }
+                            return true;
                         }
-                        return true;
                     }
+                } else {
+                    player.sendMessage(ChatColor.RED + "Protected!");
                 }
             }
         }

@@ -20,17 +20,18 @@ import java.util.ArrayList;
 
 public class SignEditorGUI implements CommandExecutor, Listener {
 
-    public static Inventory SignEditorGUI = Bukkit.createInventory(null, 36, "SignEditor GUI");
+    private static Inventory SignEditorGUI = Bukkit.createInventory(null, 36, "SignEditor GUI");
     public static Inventory messagesGUI = Bukkit.createInventory(null, 36, "Messages GUI");
 
+
     private String isNotPlayer = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("isNotPlayer").toString());
-    private boolean useINPprefix = SignEditor.getPl().fileConfiguration.getBoolean("useINPprefix");
+    private static boolean useINPprefix = SignEditor.getPl().fileConfiguration.getBoolean("useINPprefix");
     private String noPermissions = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("noPermissions").toString());
-    private boolean useNPprefix = SignEditor.getPl().fileConfiguration.getBoolean("useNPprefix");
+    private static boolean useNPprefix = SignEditor.getPl().fileConfiguration.getBoolean("useNPprefix");
     private String updatedSign = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("updatedSign").toString());
-    private boolean useUSprefix = SignEditor.getPl().fileConfiguration.getBoolean("useUSprefix");
+    private static boolean useUSprefix = SignEditor.getPl().fileConfiguration.getBoolean("useUSprefix");
     private String incorrectUsage = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("incorrectUsage").toString());
-    private boolean useIUprefix = SignEditor.getPl().fileConfiguration.getBoolean("useIUprefix");
+    private static boolean useIUprefix = SignEditor.getPl().fileConfiguration.getBoolean("useIUprefix");
     private String prefix = ChatColor.translateAlternateColorCodes('&', SignEditor.getPl().fileConfiguration.get("prefix").toString());
 
     private Material closeButtonMaterial = Material.valueOf(SignEditor.getPl().fileConfiguration.get("CloseButtonMaterial").toString());
@@ -50,8 +51,6 @@ public class SignEditorGUI implements CommandExecutor, Listener {
 
     /*
     Add a null check for basically everything, need to find a good way to do it without having to repeat myself too much.
-    Finish reload command to make the plugin more user-friendly.
-    Add a check if any items are overlapping, especially final ones like the version itemstack. Will probably have to do it manually.
     Add a {sender} variable for the config which replaces with sender.
     Move all itemstacks to another class to avoid clutter like now.
     Anything else?

@@ -1,8 +1,10 @@
 package signeditor.signeditor.Events;
 
+import lombok.Getter;
+import org.apache.commons.lang.mutable.MutableBoolean;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -10,8 +12,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import signeditor.signeditor.Commands.SignEditorGUI;
 import signeditor.signeditor.SignEditor;
+import signeditor.signeditor.Utils.LennyLib;
 
-import java.io.IOException;
+import java.io.File;
 
 public class SIgnEditorChangeEvent implements Listener {
 
@@ -21,6 +24,9 @@ public class SIgnEditorChangeEvent implements Listener {
     private boolean clickedUpdatedSign;
     private boolean clickedPrefix;
 
+
+    private File f = SignEditor.getPl().file;
+    private FileConfiguration configuration = SignEditor.getPl().fileConfiguration;
 
     @EventHandler
     public void inventoryClickPrefix(InventoryClickEvent event) {
@@ -51,7 +57,6 @@ public class SIgnEditorChangeEvent implements Listener {
                     player.sendTitle(ChatColor.GREEN + "Enter a new message", "", 10, 25, 10);
                     clickedPrefix = true;
                 }
-
             }
         }
     }
@@ -60,63 +65,18 @@ public class SIgnEditorChangeEvent implements Listener {
     public void changeConfigValueForIsNotPlayer(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         if (player.hasPermission("SignEditor.CHANGE")) {
-            if (clickedIsNotPlayer) {
-                event.setCancelled(true);
-                SignEditor.getPl().fileConfiguration.set("isNotPlayer", event.getMessage());
-                try {
-                    SignEditor.getPl().fileConfiguration.save(SignEditor.getPl().file);
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+                if (clickedIsNotPlayer) {
+                    LennyLib.lennyGetClicked(player, "isNotPlayer", event.getMessage(), configuration, f, SignEditorGUI.messagesGUI, ChatColor.GREEN + "Updated Message!", event);
+                } else if (clickedNoPermissions) {
+                    LennyLib.lennyGetClicked(player, "noPermissions", event.getMessage(), configuration, f, SignEditorGUI.messagesGUI, ChatColor.GREEN + "Updated Message!", event);
+                } else if (clickedPrefix) {
+                    LennyLib.lennyGetClicked(player, "prefix", event.getMessage(), configuration, f, SignEditorGUI.messagesGUI, ChatColor.GREEN + "Updated Message!", event);
+                } else  if (clickedUpdatedSign) {
+                    LennyLib.lennyGetClicked(player, "updatedSign", event.getMessage(), configuration, f, SignEditorGUI.messagesGUI, ChatColor.GREEN + "Updated Message!", event);
+                } else if (clickedIncorrectUsage) {
+                    LennyLib.lennyGetClicked(player, "incorrectUsage", event.getMessage(), configuration, f, SignEditorGUI.messagesGUI, ChatColor.GREEN + "Updated Message!", event);
                 }
-                SignEditor.getPl().fileConfiguration = YamlConfiguration.loadConfiguration(SignEditor.getPl().file);
-                player.sendMessage(ChatColor.GREEN + "Updated message!");
-                clickedIsNotPlayer = false;
-                player.openInventory(SignEditorGUI.messagesGUI);
-            } else if (clickedNoPermissions) {
-                event.setCancelled(true);
-                SignEditor.getPl().fileConfiguration.set("noPermissions", event.getMessage());
-                try {
-                    SignEditor.getPl().fileConfiguration.save(SignEditor.getPl().file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                clickedNoPermissions = false;
-                SignEditor.getPl().fileConfiguration = YamlConfiguration.loadConfiguration(SignEditor.getPl().file);
-                player.sendMessage(ChatColor.GREEN + "Updated message!");
-            } else if (clickedIncorrectUsage) {
-                event.setCancelled(true);
-                SignEditor.getPl().fileConfiguration.set("incorrectUsage", event.getMessage());
-                try {
-                    SignEditor.getPl().fileConfiguration.save(SignEditor.getPl().file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                clickedIncorrectUsage = false;
-                SignEditor.getPl().fileConfiguration = YamlConfiguration.loadConfiguration(SignEditor.getPl().file);
-                player.sendMessage(ChatColor.GREEN + "Updated message!");
-            } else if (clickedUpdatedSign) {
-                event.setCancelled(true);
-                SignEditor.getPl().fileConfiguration.set("updatedSign", event.getMessage());
-                try {
-                    SignEditor.getPl().fileConfiguration.save(SignEditor.getPl().file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                clickedUpdatedSign = false;
-                SignEditor.getPl().fileConfiguration = YamlConfiguration.loadConfiguration(SignEditor.getPl().file);
-                player.sendMessage(ChatColor.GREEN + "Updated message!");
-            } else if (clickedPrefix) {
-                event.setCancelled(true);
-                SignEditor.getPl().fileConfiguration.set("prefix", event.getMessage());
-                try {
-                    SignEditor.getPl().fileConfiguration.save(SignEditor.getPl().file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                clickedUpdatedSign = false;
-                SignEditor.getPl().fileConfiguration = YamlConfiguration.loadConfiguration(SignEditor.getPl().file);
-                player.sendMessage(ChatColor.GREEN + "Updated message!");
-            }
         }
     }
 }

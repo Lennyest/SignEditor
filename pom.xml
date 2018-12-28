@@ -6,7 +6,7 @@
 
     <groupId>SignEditor</groupId>
     <artifactId>SignEditor</artifactId>
-    <version>1.1</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>SignEditor</name>
@@ -65,6 +65,11 @@
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.4</version>
+        </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>

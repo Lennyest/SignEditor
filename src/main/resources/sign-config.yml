@@ -11,7 +11,7 @@
 #use & to use colors! Example: &c = red &6 = gold
 prefix: "&6SignEditor >"
 #Version:
-Version: 1.1
+Version: 1.1.0
 #Version item:
 UseVersionItem: true
 #When it is not a player, for example the console.
@@ -35,6 +35,14 @@ useRMprefix: false
 #If the player used for example /signeditor 5 <text> instead of 0-3.
 incorrectUsage: "&cIncorrect usage, /signeditor <0-3> <text>"
 useIUprefix: false
+#Bypass protection.
+bypassProtectionEnable: "&cBypass enabled!"
+bypassProtectionDisable: "&cBypass disabled!"
+useBPprefixEnable: false
+useBPprefixDisable: false
+#When another player tries to edit a sign that is protected.
+signIsProtected: "&cSign is protected!"
+useSIPprefix: false
 ##Max distance you have to be away from a sign when it is on a wall.
 #Do not use "" or '' use only pure numbers.
 SignPostMaxDistance: 5
